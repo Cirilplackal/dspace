@@ -1,6 +1,6 @@
 # DSpace - Modern E-commerce Platform
 
-A modern e-commerce platform built with Next.js, Redux Toolkit, and Tailwind CSS.
+A modern full-stack e-commerce platform built with Next.js 14, Redux Toolkit, Prisma, and Tailwind CSS.
 
 ## 🚀 Quick Start
 
@@ -10,143 +10,220 @@ A modern e-commerce platform built with Next.js, Redux Toolkit, and Tailwind CSS
 
 ### Running the Application
 
-#### 1. Start the Backend API
 ```bash
-cd backend
+# Install dependencies
 npm install
-npm start
-```
-The backend will run on `http://localhost:3001`
 
-#### 2. Start the Frontend
-```bash
-# In a new terminal, from the project root
-npm install
+# Set up the database (if using Prisma)
+npm run db:generate
+npm run db:push
+
+# Start the development server
 npm run dev
 ```
-The frontend will run on `http://localhost:3000`
 
-## 🔧 What's Fixed
+The application will run on `http://localhost:3000`
 
-### API Issues
-- ✅ Complete backend API with all required endpoints
-- ✅ Proper response format matching frontend expectations
-- ✅ Mock data for testing (users, products, categories)
-- ✅ Error handling and validation
+## 🎯 Features
 
-### Authentication
-- ✅ Login page (`/auth/login`)
-- ✅ Registration page (`/auth/register`)
-- ✅ Redux integration for auth state management
-- ✅ Form validation with Zod
-- ✅ Token management and storage
+### ✅ Implemented Features
+- **Full-stack Next.js Application**: API routes built into the Next.js app
+- **Authentication System**: Login and registration with JWT tokens
+- **Product Management**: Product listing with search, filtering, and pagination
+- **Modern UI**: Responsive design with Tailwind CSS and Lucide React icons
+- **State Management**: Redux Toolkit for global state management
+- **Type Safety**: Full TypeScript support throughout the application
+- **Form Handling**: React Hook Form with Zod validation
+- **Dark Mode**: Theme switching support
+- **Error Handling**: Comprehensive error boundaries and user feedback
+- **Database Ready**: Prisma ORM integration for database operations
 
-### Error Handling
-- ✅ Global error page (`/app/error.tsx`)
-- ✅ 404 Not Found page (`/app/not-found.tsx`)
-- ✅ API error handling and user feedback
-
-### Data Types
-- ✅ Fixed type mismatches between frontend and backend
-- ✅ Proper API response structure
-- ✅ Redux store integration
-
-## 🧪 Testing
-
-Visit `http://localhost:3000/test` to see a test page that verifies:
-- API connectivity
-- Products fetching
-- Redux store functionality
+### 🔄 In Progress
+- Database integration with Prisma
+- User profile management
+- Shopping cart functionality
+- Order management
+- Admin dashboard
 
 ## 📝 API Endpoints
 
 ### Authentication
 - `POST /api/auth/login` - User login
 - `POST /api/auth/register` - User registration
-- `POST /api/auth/logout` - User logout
-- `POST /api/auth/refresh` - Refresh token
 - `GET /api/auth/profile` - Get user profile
 
 ### Products
 - `GET /api/products` - Get products with pagination/filters
-- `GET /api/products/:id` - Get product by ID
-- `GET /api/products/search` - Search products
-
-### Categories
-- `GET /api/categories` - Get all categories
-- `GET /api/categories/:id` - Get category by ID
+  - Query params: `page`, `limit`, `category`, `q`, `minPrice`, `maxPrice`, `sortBy`, `sortOrder`
 
 ### Health Check
 - `GET /api/health` - API health status
 
-## 🔑 Test Credentials
-
-For testing the login functionality:
-- Email: `john@example.com`
-- Password: `password123`
-
 ## 🛠️ Development
 
-### Backend Development
+### Available Scripts
 ```bash
-cd backend
-npm run dev  # Uses nodemon for auto-restart
-```
-
-### Frontend Development
-```bash
-npm run dev  # Next.js development server
-npm run build  # Build for production
-npm run lint  # Run ESLint
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint issues
+npm run type-check   # Run TypeScript type checking
+npm run format       # Format code with Prettier
+npm run format:check # Check code formatting
+npm run db:generate  # Generate Prisma client
+npm run db:push      # Push database schema
+npm run db:studio    # Open Prisma Studio
 ```
 
 ## 📁 Project Structure
 
 ```
 dspace/
-├── backend/           # Express.js API server
-│   ├── server.js     # Main server file
-│   └── package.json  # Backend dependencies
 ├── src/
-│   ├── app/          # Next.js App Router pages
-│   │   ├── auth/     # Authentication pages
-│   │   ├── error.tsx # Global error page
-│   │   └── not-found.tsx # 404 page
-│   ├── components/   # React components
-│   ├── services/     # API services
-│   ├── store/        # Redux store and slices
-│   └── types/        # TypeScript type definitions
-└── package.json      # Frontend dependencies
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/               # API routes
+│   │   │   ├── auth/          # Authentication endpoints
+│   │   │   ├── products/      # Product endpoints
+│   │   │   └── health/        # Health check endpoint
+│   │   ├── auth/              # Authentication pages
+│   │   │   ├── login/         # Login page
+│   │   │   └── register/      # Registration page
+│   │   ├── products/          # Products listing page
+│   │   ├── error.tsx          # Global error page
+│   │   ├── not-found.tsx      # 404 page
+│   │   └── layout.tsx         # Root layout
+│   ├── components/            # React components
+│   │   ├── home/              # Home page components
+│   │   ├── layout/            # Layout components
+│   │   ├── products/          # Product-related components
+│   │   ├── providers/         # Context providers
+│   │   └── ui/                # Reusable UI components
+│   ├── services/              # API services
+│   │   └── api/               # API client and services
+│   ├── store/                 # Redux store
+│   │   └── slices/            # Redux slices
+│   ├── types/                 # TypeScript type definitions
+│   ├── lib/                   # Utility functions and mock data
+│   └── constants/             # Application constants
+├── public/                    # Static assets
+├── prisma/                    # Database schema and migrations
+└── package.json               # Dependencies and scripts
 ```
 
-## 🎨 Features
+## 🎨 UI Components
 
-- **Modern UI**: Built with Tailwind CSS and Lucide React icons
-- **Type Safety**: Full TypeScript support
-- **State Management**: Redux Toolkit for global state
-- **Form Handling**: React Hook Form with Zod validation
-- **Responsive Design**: Mobile-first approach
-- **Dark Mode**: Theme switching support
-- **Error Handling**: Comprehensive error boundaries and user feedback
+### Core Components
+- **ProductGrid**: Displays products in a responsive grid
+- **SearchBar**: Product search functionality
+- **CategoryFilter**: Filter products by category
+- **PriceFilter**: Filter products by price range
+- **SortSelect**: Sort products by various criteria
+- **Pagination**: Navigate through product pages
+- **LoadingSpinner**: Loading state indicator
+- **EmptyState**: Empty state for no results
+- **UserMenu**: User account menu
+- **Header**: Main navigation header
+- **Sidebar**: Sidebar navigation
+
+### Form Components
+- **Login Form**: User authentication
+- **Registration Form**: User registration
+- **Form validation**: Zod schema validation
+
+## 🔧 Configuration
+
+### Environment Variables
+Create a `.env.local` file in the root directory:
+
+```env
+# Database
+DATABASE_URL="your-database-url"
+
+# JWT Secret
+JWT_SECRET="your-jwt-secret"
+
+# Next.js
+NEXTAUTH_SECRET="your-nextauth-secret"
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+### Tailwind CSS
+The project uses Tailwind CSS with custom configuration for:
+- Dark mode support
+- Custom color palette
+- Responsive design utilities
+- Form styling
+
+## 🧪 Testing
+
+### Manual Testing
+- Visit `http://localhost:3000` for the home page
+- Navigate to `/products` for product listing
+- Test authentication at `/auth/login` and `/auth/register`
+- Check API endpoints at `/api/health`
+
+### Test Data
+The application includes mock data for testing:
+- Sample products with various categories and prices
+- Test user credentials (check the auth API for details)
 
 ## 🚨 Troubleshooting
 
 ### Common Issues
 
-1. **Backend not starting**: Make sure port 3001 is available
-2. **Frontend can't connect to API**: Ensure backend is running on port 3001
-3. **Type errors**: Run `npm run type-check` to verify TypeScript
-4. **Build errors**: Clear `.next` folder and reinstall dependencies
+1. **Port already in use**: Make sure port 3000 is available
+2. **Type errors**: Run `npm run type-check` to verify TypeScript
+3. **Build errors**: Clear `.next` folder and reinstall dependencies
+4. **Database issues**: Ensure Prisma is properly configured
 
 ### Reset Everything
 ```bash
-# Stop all processes
-# Clear node_modules and reinstall
-rm -rf node_modules backend/node_modules
+# Stop the development server
+# Clear cache and reinstall dependencies
+rm -rf .next node_modules
 npm install
-cd backend && npm install
+npm run dev
 ```
+
+## 📦 Dependencies
+
+### Core Dependencies
+- **Next.js 14**: React framework with App Router
+- **React 18**: UI library
+- **Redux Toolkit**: State management
+- **Prisma**: Database ORM
+- **Tailwind CSS**: Utility-first CSS framework
+- **Lucide React**: Icon library
+- **React Hook Form**: Form handling
+- **Zod**: Schema validation
+
+### Development Dependencies
+- **TypeScript**: Type safety
+- **ESLint**: Code linting
+- **Prettier**: Code formatting
+- **PostCSS**: CSS processing
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
 
 ## 📄 License
 
 This project is licensed under the MIT License.
+
+## 🔮 Roadmap
+
+- [ ] Complete database integration
+- [ ] Shopping cart functionality
+- [ ] Order management system
+- [ ] Admin dashboard
+- [ ] Payment integration
+- [ ] User reviews and ratings
+- [ ] Wishlist functionality
+- [ ] Email notifications
+- [ ] Advanced search filters
