@@ -1,24 +1,20 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { API_BASE_URL, API_TIMEOUT, STORAGE_KEYS } from '@/constants';
+import { STORAGE_KEYS } from '@/constants';
 
 class ApiClient {
-  private client: AxiosInstance;
+  private instance: AxiosInstance;
 
   constructor() {
-    this.client = axios.create({
-      baseURL: API_BASE_URL,
-      timeout: API_TIMEOUT,
+    this.instance = axios.create({
+      baseURL: '/api', // Use Next.js API routes
+      timeout: 10000,
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    this.setupInterceptors();
-  }
-
-  private setupInterceptors() {
     // Request interceptor
-    this.client.interceptors.request.use(
+    this.instance.interceptors.request.use(
       (config) => {
         // Add auth token to requests
         const token = this.getAuthToken();
@@ -33,37 +29,33 @@ class ApiClient {
     );
 
     // Response interceptor
-    this.client.interceptors.response.use(
-      (response: AxiosResponse) => {
-        return response;
-      },
+    this.instance.interceptors.response.use(
+      (response) => response,
       async (error) => {
         const originalRequest = error.config;
 
-        // Handle 401 errors (unauthorized)
+        // Handle 401 errors
         if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
 
-          try {
-            // Try to refresh token
-            const refreshToken = this.getRefreshToken();
-            if (refreshToken) {
-              const response = await this.client.post('/auth/refresh', {
+          // Try to refresh token
+          const refreshToken = this.getRefreshToken();
+          if (refreshToken) {
+            try {
+              const response = await this.instance.post('/auth/refresh', {
                 refreshToken,
               });
-              
-              const { token } = response.data;
+              const { token } = response.data.data;
               this.setAuthToken(token);
               
               // Retry original request with new token
               originalRequest.headers.Authorization = `Bearer ${token}`;
-              return this.client(originalRequest);
-            }
-          } catch (refreshError) {
-            // Refresh failed, clear tokens and redirect to login
-            this.clearAuthTokens();
-            if (typeof window !== 'undefined') {
+              return this.instance(originalRequest);
+            } catch (refreshError) {
+              // Refresh failed, clear tokens and redirect to login
+              this.clearAuthTokens();
               window.location.href = '/auth/login';
+              return Promise.reject(refreshError);
             }
           }
         }
@@ -73,6 +65,37 @@ class ApiClient {
     );
   }
 
+  // Generic request methods
+  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    return this.instance.get(url, config);
+  }
+
+  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    return this.instance.post(url, data, config);
+  }
+
+  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    return this.instance.put(url, data, config);
+  }
+
+  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    return this.instance.patch(url, data, config);
+  }
+
+  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
+    return this.instance.delete(url, config);
+  }
+
+  // File upload method
+  async upload<T = any>(url: string, formData: FormData): Promise<AxiosResponse<T>> {
+    return this.instance.post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
+  // Auth token management
   private getAuthToken(): string | null {
     if (typeof window === 'undefined') return null;
     return localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
@@ -84,70 +107,17 @@ class ApiClient {
   }
 
   private setAuthToken(token: string): void {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
-    }
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
   }
 
   private clearAuthTokens(): void {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-      localStorage.removeItem('refresh_token');
-    }
-  }
-
-  // Generic request methods
-  async get<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.get<T>(url, config);
-  }
-
-  async post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.post<T>(url, data, config);
-  }
-
-  async put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.put<T>(url, data, config);
-  }
-
-  async patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.patch<T>(url, data, config);
-  }
-
-  async delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.delete<T>(url, config);
-  }
-
-  // File upload method
-  async upload<T = any>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-    return this.client.post<T>(url, formData, {
-      ...config,
-      headers: {
-        ...config?.headers,
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-  }
-
-  // Download file method
-  async download(url: string, filename?: string): Promise<void> {
-    const response = await this.client.get(url, {
-      responseType: 'blob',
-    });
-
-    const blob = new Blob([response.data]);
-    const downloadUrl = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = filename || 'download';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(downloadUrl);
+    if (typeof window === 'undefined') return;
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    localStorage.removeItem('refresh_token');
   }
 }
 
-// Create singleton instance
-export const apiClient = new ApiClient();
-
-// Export for use in other modules
+// Export singleton instance
+const apiClient = new ApiClient();
 export default apiClient; 

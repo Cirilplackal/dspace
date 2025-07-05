@@ -192,13 +192,16 @@ const productsSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.items = action.payload?.data || [];
-        state.pagination = action.payload?.pagination || {
+        console.log('Redux fetchProducts fulfilled payload:', action.payload);
+        // Handle the nested structure: action.payload.data.products
+        state.items = action.payload?.data?.products || action.payload?.data || [];
+        state.pagination = action.payload?.data?.pagination || action.payload?.pagination || {
           page: 1,
           limit: APP_CONFIG.DEFAULT_PAGE_SIZE,
           total: 0,
           totalPages: 0,
         };
+        console.log('Redux state.items after update:', state.items);
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.isLoading = false;

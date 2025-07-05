@@ -16,7 +16,8 @@ const nextConfig = {
   
   // Environment variables
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
+    NEXT_PUBLIC_APP_NAME: 'DSpace',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
   
   // Security headers
@@ -41,30 +42,34 @@ const nextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains',
-          },
         ],
       },
     ];
   },
   
-  // API route rewrites for better security
+  // API routes configuration
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
     return [
       {
         source: '/api/:path*',
-        destination: `${apiUrl}/:path*`,
+        destination: '/api/:path*',
       },
     ];
   },
   
-  // Experimental features for better performance
+  // Experimental features
   experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['lucide-react', '@reduxjs/toolkit'],
+    serverComponentsExternalPackages: ['bcryptjs'],
+  },
+  
+  // TypeScript configuration
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  
+  // ESLint configuration
+  eslint: {
+    ignoreDuringBuilds: false,
   },
   
   // Webpack configuration for better bundle optimization

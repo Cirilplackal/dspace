@@ -13,6 +13,8 @@ import { Pagination } from '@/components/ui/Pagination';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { objectToSearchParams } from '@/lib/utils';
+import { CloudCog } from 'lucide-react';
+import { mockProducts } from '@/lib/mockData';
 
 export default function ProductsPage() {
   const router = useRouter();
@@ -24,7 +26,7 @@ export default function ProductsPage() {
   );
 
   const [debouncedSearch, setDebouncedSearch] = useState('');
-
+console.log(products,"products");
   // Parse search params
   const query = searchParams.get('q') || '';
   const category = searchParams.get('category') || '';
@@ -160,10 +162,12 @@ export default function ProductsPage() {
       )}
 
       {/* Products Grid */}
+
+      {/*added mock data for testing : need to remove this after api integration*/}
       {isLoading ? (
         <LoadingSpinner />
-      ) : products?.length > 0 ? (
-        <ProductGrid products={products} />
+      ) : mockProducts?.length > 0 ? (
+        <ProductGrid products={mockProducts} />
       ) : (
         <EmptyState
           title="No products found"
